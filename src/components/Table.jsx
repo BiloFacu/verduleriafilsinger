@@ -1,11 +1,13 @@
 'use client'
 import Link from "next/link"
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function Table(products){
+export default function Table(){
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter()
+  const [products, setProducts] = useState([])
+  const [filteredProducts, setFilteredProducts] = useState([])
   const calcularPrecioTotal = (precio, porcentaje) => {
      return precio + (precio * (porcentaje / 100));
   };
@@ -16,9 +18,24 @@ export default function Table(products){
       router.refresh()
     }
 
-  const filteredProducts = products.products.filter(product =>
-    product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    const getProducts = async () => {
+      const res = await fetch(`/api/products`);
+      const data = await res.json();
+      setProducts(data);
+    };
+  
+    useEffect(() => {
+      getProducts();
+    }, []);
+    
+    useEffect(() => {
+      const filtered = products.filter(product =>
+        product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+        setFilteredProducts(filtered)
+    }, [searchTerm])
+    
+ 
     return(
       <div>
       <div className="flex items-center my-4 mx-auto">
@@ -49,7 +66,7 @@ export default function Table(products){
         </thead>
         <tbody>
         {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) =>{
+            filteredProducts?.map((product) =>{
               const precioTotal = calcularPrecioTotal(product.precio, product.porcentaje);
               return (<tr key={product._id} className="hover:bg-gray-100">
                 <td className="px-6 py-4 border-b border-gray-200 text-sm">{product.id}</td>
@@ -65,7 +82,7 @@ export default function Table(products){
                   <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onClick={() => {deleteProduct(product._id)}}>Eliminar</button>
                 </td>
               </tr>)}
-            )) : products.products.map((product) => {
+            )) : products.map((product) => {
               const precioTotal = calcularPrecioTotal(product.precio, product.porcentaje);
               return (
                 <tr key={product._id} className="hover:bg-gray-100">
