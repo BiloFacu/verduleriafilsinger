@@ -29,9 +29,15 @@ export async function PUT(req, { params }) {
       if (!client) {
         return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 });
       }
-      console.log(client.debe, data.debe)
+      if(data.opcionDebe){
+        const ClientUpdate = await Clients.findByIdAndUpdate(
+          params.id,
+          { debe: data.debe },
+          { new: true }
+        );
+        return NextResponse.json(ClientUpdate);
+      }
       const nuevoDebe = client.debe + data.debe;
-      console.log(nuevoDebe)
       const ClientUpdate = await Clients.findByIdAndUpdate(
         params.id,
         { debe: nuevoDebe },

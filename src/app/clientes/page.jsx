@@ -19,7 +19,7 @@ const ClientsSection = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({nombre, celular}),
+        body: JSON.stringify({nombre, celular, debe:0}),
       });
       if (response.ok) {
         const data = await response.json();
@@ -64,8 +64,15 @@ const ClientsSection = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({debe:selectedClient.debe-pago}), // Convierte el objeto `product` a un JSON
+      body: JSON.stringify({debe:selectedClient.debe-pago, opcionDebe:true}), // Convierte el objeto `product` a un JSON
     });
+    const res = await fetch('/api/pagos',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({nombre:selectedClient.nombre, metododepago:metodoPago, pago:pago})
+    })
     setData(response)
     closeModal();
   };
