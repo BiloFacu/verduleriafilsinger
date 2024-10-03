@@ -19,6 +19,10 @@ const SalesSection = () => {
   const [clients, setClients] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
 
+  const calcularPrecioTotal = (precio, porcentaje) => {
+    return precio + (precio * (porcentaje / 100));
+ };
+
 
   const paymentMethods = ['Efectivo', 'Tarjeta', 'Transferencia', 'Cuenta Cliente']; // Métodos de pago
 
@@ -39,8 +43,9 @@ const SalesSection = () => {
 
   // Manejar la selección del producto de la lista de sugerencias
   const handleProductSelect = (selectedProduct) => {
+    const precioporcentaje = calcularPrecioTotal(selectedProduct.precio , selectedProduct.porcentaje)
     setProduct(selectedProduct.nombre);
-    setPrice(selectedProduct.precio);
+    setPrice(precioporcentaje);
     setId(selectedProduct._id);
     setMaxQuantity(selectedProduct.cantidad)
     setFilteredProducts([]);
@@ -48,6 +53,7 @@ const SalesSection = () => {
 
   // Manejar el envío del formulario
   const handleSubmit = (e) => {
+    
     e.preventDefault();
     if (product && quantity) {
       const newSale = { productid:id , product, quantity: parseFloat(quantity), price: parseFloat(price), priceTotal: parseFloat(quantity)*parseFloat(price), cantidadTotal: parseFloat(maxQuantity) };
@@ -167,15 +173,17 @@ const SalesSection = () => {
           {/* Mostrar lista de productos filtrados */}
           {filteredProducts.length > 0 && (
             <ul className="absolute left-0 right-0 bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-auto z-10">
-              {filteredProducts.map((prod, index) => (
+              {filteredProducts.map((prod, index) =>{
+                const precioTotal = calcularPrecioTotal(prod.precio, prod.porcentaje);
+                return(
                 <li
                   key={index}
                   className="p-2 cursor-pointer hover:bg-blue-100"
                   onClick={() => handleProductSelect(prod)}
                 >
-                  {prod.nombre}  {prod.precio}
+                  {prod.nombre}  {precioTotal}
                 </li>
-              ))}
+              )})}
             </ul>
           )}
         </div>
